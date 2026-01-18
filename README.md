@@ -1,58 +1,64 @@
 # MyShell OS 🐚
 
-MyShell OS is a lightweight, 16-bit Operating System kernel built from scratch in Assembly (NASM). It was developed to bridge the gap between human logic and low-level machine language, featuring a unique real-time Transparent Tokenizer.
+MyShell OS adalah kernel Sistem Operasi 16-bit yang ringan, dibangun dari nol menggunakan Assembly (NASM). OS ini dikembangkan untuk menjembatani logika manusia dengan bahasa mesin tingkat rendah, menampilkan Tokenizer Transparan real-time yang unik.
 
-## 🌟 Key Features
+## 🌟 Fitur Utama
 
-### 1. Transparent Tokenizer (Innovation I)
-Visualizes the OS command parsing logic in real-time.
-- **Dual-Line Display**: Input on top, tokenizer visualization below.
-- **Zero-Latency**: Updates instantly via direct Video Memory manipulation.
-- **Visual Feedback**: Shows `CMD: [command] ARG: [argument]` as you type.
+### 1. Tokenizer Transparan (Inovasi I)
+Memvisualisasikan logika parsing perintah OS secara real-time.
+- **Tampilan Baris Ganda**: Input di atas, visualisasi tokenizer di bawah.
+- **Tanpa Latensi**: Memperbarui secara instan melalui manipulasi Memori Video langsung.
+- **Umpan Balik Visual**: Menampilkan `CMD: [perintah] ARG: [argumen]` saat Anda mengetik.
 
-### 2. Auto-Guess Feature
-Optimized command execution using Prefix Matching.
-- Type `h` -> Executes `help`
-- Type `r` -> Executes `reboot`
-- Type `e` -> Executes `echo`
+### 2. Fitur Auto-Guess
+Eksekusi perintah yang dioptimalkan menggunakan Pencocokan Awalan (Prefix Matching).
+- Ketik `h` -> Menjalankan `help`
+- Ketik `r` -> Menjalankan `reboot`
+- Ketik `e` -> Menjalankan `echo`
+- Ketik `c` -> Menjalankan `cls` (Bersihkan Layar)
 
-### 3. Hardware Pulse Monitor (Innovation II)
-A bare-metal task manager alternative.
-- Command: `pulse`
-- Monitors:
-  - CPU Mode (Real Mode 16-bit)
-  - Memory Detection (Standard 640KB)
-  - System Uptime (BIOS Ticks Hexdump)
+### 3. Monitor Denyut Perangkat Keras (Inovasi II)
+Alternatif task manager bare-metal.
+- Perintah: `pulse`
+- Memantau:
+  - Mode CPU (Real Mode 16-bit)
+  - Deteksi Memori (Standar 640KB)
+  - Waktu Nyala Sistem (BIOS Ticks Hexdump)
 
-### 4. Custom Bootloader
-- **Multi-Stage Architecture**:
-  - **Stage 1 (MBR)**: Loads Kernel from disk to memory `0x1000`.
-  - **Stage 2 (Kernel)**: The main OS shell loop and logic.
+### 4. Bootloader Kustom
+- **Arsitektur Multi-Tahap**:
+  - **Tahap 1 (MBR)**: Memuat Kernel dari disk ke memori `0x1000`.
+  - **Tahap 2 (Kernel)**: Loop shell utama dan logika OS.
 
-## 🛠️ Tech Stack
-- **Language**: Pure Assembly (NASM)
-- **Architecture**: x86 Real Mode (16-bit)
-- **Tools**: NASM, QEMU/VirtualBox
-- **No External Libraries**: All I/O is handled via BIOS Interrupts.
+## 🛠️ Stack Teknologi
+- **Bahasa**: Assembly Murni (NASM)
+- **Arsitektur**: x86 Real Mode (16-bit)
+- **Alat**: NASM, VirtualBox
+- **Tanpa Pustaka Eksternal**: Semua I/O ditangani melalui BIOS Interrupts.
 
-## 🚀 How to Build & Run
-Prerequisites: `nasm`, `qemu-system-x86_64`.
+## 🚀 Cara Build & Jalankan
+Prasyarat: `nasm`, `VirtualBox`.
 
 1. **Build**:
-   ```bash
+   ```batch
    .\build.bat
    ```
-   This will compile `boot.asm` and `kernel.asm`, then pad them into a 1.44MB Floppy Image (`myshell.img`).
+   Ini akan mengompilasi `boot.asm` dan `kernel.asm`, lalu menggabungkannya menjadi Image Floppy 1.44MB (`bin\myshell.img`).
 
-2. **Run**:
-   ```bash
-   qemu-system-x86_64 -flp bin\myshell.img
-   ```
+2. **Jalankan di VirtualBox**:
+   - Buat Virtual Machine baru:
+     - **Type**: Other
+     - **Version**: Other/Unknown
+     - **Memory**: 64 MB (Cukup)
+   - Masuk ke **Settings** -> **Storage**.
+   - Tambahkan **Floppy Controller** (I82078).
+   - Tambahkan Floppy Device dan pilih file disk `bin\myshell.img`.
+   - Jalankan VM (Start).
 
-## 📂 Project Structure
-- `boot/`: Bootloader source code.
-- `kernel/`: Kernel source code (`kernel_main.asm`).
-- `bin/`: Compiled binaries (Ignored by Git).
+## 📂 Struktur Proyek
+- `boot/`: Kode sumber Bootloader.
+- `kernel/`: Kode sumber Kernel (`kernel_main.asm`).
+- `bin/`: Binary hasil kompilasi (Diabaikan oleh Git).
 
 ---
-*Developed for Operating System Practicum Final Project.*
+*Dikembangkan untuk Tugas Akhir Praktikum Sistem Operasi.*

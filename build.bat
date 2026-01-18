@@ -14,4 +14,4 @@ REM Combine bootloader (512 bytes) + kernel
 copy /b bin\boot.bin + bin\kernel.bin bin\myshell.img
 
 echo Build successful!
-echo Run with: qemu-system-x86_64 -flp bin\myshell.img
+echo Load bin\myshell.img in VirtualBox to run.

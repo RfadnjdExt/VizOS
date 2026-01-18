@@ -1,6 +1,9 @@
 [BITS 16]
 [ORG 0x0000]
 
+; Define Buffer Address (Fixed to avoid label shift issues)
+command_buffer equ 0x2000
+
 start:
     ; Setup Segments
     mov ax, 0x1000
@@ -230,27 +233,138 @@ process_command:
     je .done
     
     cmp al, 'h'
-    je .is_help
+    jne .check_r
+    jmp handler_help
+.check_r:
     cmp al, 'r'
-    je .is_reboot
+    jne .check_p
+    jmp handler_reboot
+.check_p:
     cmp al, 'p'
-    je .is_pulse
+    jne .check_c
+    jmp handler_pulse
+.check_c:
+    cmp al, 'c'
+    jne .check_t
+    jmp handler_cls
+.check_t:
+    cmp al, 't'
+    jne .check_d
+    jmp handler_time
+.check_d:
+    cmp al, 'd'
+    jne .check_e
+    jmp handler_date
+.check_e:
     cmp al, 'e'
-    je .is_echo
+    jne .unknown
+    jmp handler_echo
 
+.unknown:
     mov si, unknown_msg
     call print_string
     call print_newline
 .done:
     ret
 
-.is_help:
+handler_cls:
+    ; Scroll/Clear Window (AH=06h)
+    mov ah, 0x06
+    mov al, 0       ; 0 = Clear entire window
+    mov bh, 0x07    ; Attribute: White on Black
+    mov cx, 0       ; Top-Left (0,0)
+    mov dx, 0x184F  ; Bottom-Right (24,79)
+    int 0x10
+    
+    ; Reset Cursor to (0,0)
+    mov ah, 0x02
+    mov bh, 0
+    mov dx, 0
+    int 0x10
+    ret
+
+handler_time:
+    mov ah, 0x02    ; Get Real-Time Clock Time
+    int 0x1A        ; Returns CH=Hour, CL=Minute, DH=Second
+    
+    mov al, ch      ; Hour
+    call print_bcd
+    
+    mov al, ':'
+    mov ah, 0x0E
+    int 0x10
+    
+    mov al, cl      ; Minute
+    call print_bcd
+    
+    mov al, ':'
+    mov ah, 0x0E
+    int 0x10
+    
+    mov al, dh      ; Second
+    call print_bcd
+    
+    call print_newline
+    ret
+
+handler_date:
+    mov ah, 0x04    ; Get Real-Time Clock Date
+    int 0x1A        ; Returns CX=Year, DH=Month, DL=Day
+    
+    mov al, ch      ; Year (Century, e.g. 20)
+    call print_bcd
+    mov al, cl      ; Year (Year, e.g. 23)
+    call print_bcd
+    
+    mov al, '-'
+    mov ah, 0x0E
+    int 0x10
+    
+    mov al, dh      ; Month
+    call print_bcd
+    
+    mov al, '-'
+    mov ah, 0x0E
+    int 0x10
+    
+    mov al, dl      ; Day
+    call print_bcd
+    
+    call print_newline
+    ret
+
+; Helper to print BCD value in AL
+print_bcd:
+    push ax
+    push bx
+    
+    mov bl, al      ; Save original BCD
+    
+    ; Upper Nibble (Tens)
+    and al, 0xF0
+    shr al, 4
+    add al, '0'
+    mov ah, 0x0E
+    int 0x10
+    
+    ; Lower Nibble (Ones)
+    mov al, bl
+    and al, 0x0F
+    add al, '0'
+    mov ah, 0x0E
+    int 0x10
+    
+    pop bx
+    pop ax
+    ret
+
+handler_help:
     mov si, help_msg
     call print_string
     call print_newline
     ret
 
-.is_echo:
+handler_echo:
     mov si, command_buffer
 .echo_skip:
     lodsb
@@ -265,14 +379,14 @@ process_command:
     call print_newline
     ret
 
-.is_reboot:
+handler_reboot:
     mov si, reboot_msg
     call print_string
     call print_newline
     db 0xEA, 0x00, 0x00, 0xFF, 0xFF ; Jump FFFF:0000
     ret
 
-.is_pulse:
+handler_pulse:
     mov si, pulse_header
     call print_string
     call print_newline
@@ -352,6 +466,8 @@ pulse_cpu db 'CPU : Mode Real 16-bit (Aktif)', 0
 pulse_mem db 'MEM : 640KB RAM Konvensional Terdeteksi', 0
 pulse_tick db 'WAKTU NYALA (TICKS): 0x', 0
 
-command_buffer times 128 db 0
+
+; Buffer moved to fixed address
+
 
 times 1474048 - ($ - $$) db 0
