@@ -456,8 +456,8 @@ print_string:
 
 str_cmd_label db 'CMD: ', 0
 str_arg_label db ' ARG: ', 0
-welcome_msg db 'Selamat Datang di Kernel MyShell OS (Mode Enhanced)', 0
-prompt_msg db 'MYSHELL> ', 0
+welcome_msg db 'Selamat Datang di Kernel VizOS (Mode Enhanced)', 0
+prompt_msg db 'VIZOS> ', 0
 unknown_msg db 'Perintah tidak dikenal.', 0
 help_msg db 'Perintah Tersedia: help, reboot, pulse, echo', 0
 reboot_msg db 'Sistem akan dimuat ulang...', 0

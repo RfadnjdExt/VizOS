@@ -1,6 +1,6 @@
-# MyShell OS 🐚
+# VizOS 👁️
 
-MyShell OS adalah kernel Sistem Operasi 16-bit yang ringan, dibangun dari nol menggunakan Assembly (NASM). OS ini dikembangkan untuk menjembatani logika manusia dengan bahasa mesin tingkat rendah, menampilkan Tokenizer Transparan real-time yang unik.
+VizOS adalah kernel Sistem Operasi 16-bit yang ringan, dibangun dari nol menggunakan Assembly (NASM). OS ini dikembangkan untuk menjembatani logika manusia dengan bahasa mesin tingkat rendah, menampilkan Tokenizer Transparan real-time yang unik.
 
 ## 🌟 Fitur Utama
 
