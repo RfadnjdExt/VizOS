@@ -257,8 +257,12 @@ process_command:
     jmp handler_date
 .check_e:
     cmp al, 'e'
-    jne .unknown
+    jne .check_k
     jmp handler_echo
+.check_k:
+    cmp al, 'k'
+    jne .unknown
+    jmp handler_color
 
 .unknown:
     mov si, unknown_msg
@@ -271,7 +275,7 @@ handler_cls:
     ; Scroll/Clear Window (AH=06h)
     mov ah, 0x06
     mov al, 0       ; 0 = Clear entire window
-    mov bh, 0x07    ; Attribute: White on Black
+    mov bh, [current_attrib] ; Attribute from variable
     mov cx, 0       ; Top-Left (0,0)
     mov dx, 0x184F  ; Bottom-Right (24,79)
     int 0x10
@@ -281,6 +285,62 @@ handler_cls:
     mov bh, 0
     mov dx, 0
     int 0x10
+    ret
+
+handler_color:
+    ; Format: k XX (where XX is hex color)
+    ; Example: k 1F (Blue background, White text)
+    mov si, command_buffer
+    inc si          ; Skip 'k'
+    inc si          ; Skip space (assuming 'k ' format)
+    
+    ; Parse First Hex Digit (High Nibble)
+    lodsb
+    call char_to_hex
+    mov bl, al
+    shl bl, 4
+    
+    ; Parse Second Hex Digit (Low Nibble)
+    lodsb
+    call char_to_hex
+    or bl, al
+    
+    ; Store new attribute
+    mov [current_attrib], bl
+    
+    ; Apply immediately by clearing screen
+    call handler_cls
+    ret
+
+char_to_hex:
+    ; Input: AL (ASCII) -> Output: AL (Value 0-15)
+    cmp al, '0'
+    jl .done_hex
+    cmp al, '9'
+    jle .is_digit
+    cmp al, 'A'
+    jl .done_hex
+    cmp al, 'F'
+    jle .is_upper
+    cmp al, 'a'
+    jl .done_hex
+    cmp al, 'f'
+    jle .is_lower
+    jmp .done_hex
+
+.is_digit:
+    sub al, '0'
+    ret
+.is_upper:
+    sub al, 'A'
+    add al, 10
+    ret
+.is_lower:
+    sub al, 'a'
+    add al, 10
+    ret
+.done_hex:
+    mov al, 0
     ret
 
 handler_time:
@@ -465,6 +525,7 @@ pulse_header db '--- MONITOR STATISTIK HARDWARE ---', 0
 pulse_cpu db 'CPU : Mode Real 16-bit (Aktif)', 0
 pulse_mem db 'MEM : 640KB RAM Konvensional Terdeteksi', 0
 pulse_tick db 'WAKTU NYALA (TICKS): 0x', 0
+current_attrib db 0x07 ; Default White on Black
 
 
 ; Buffer moved to fixed address
